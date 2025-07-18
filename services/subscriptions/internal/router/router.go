@@ -8,6 +8,7 @@ type Handlers interface {
 	ReadSubs(w http.ResponseWriter, r *http.Request)
 	UpdateSub(w http.ResponseWriter, r *http.Request)
 	DeleteSub(w http.ResponseWriter, r *http.Request)
+	ShowMethods(w http.ResponseWriter, r *http.Request)
 }
 type Router struct {
 	r Handlers
@@ -26,6 +27,13 @@ func (router *Router) InitRoutes(mux *http.ServeMux) {
 			router.r.ReadSubs(w, r)
 		case http.MethodPost:
 			router.r.CreateSub(w, r)
+		}
+	})
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodOptions:
+			router.r.ShowMethods(w, r)
 		}
 	})
 
