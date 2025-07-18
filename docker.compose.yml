@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  subscription:
+    build:
+      context: ./services/subscription
+      dockerfile: Dockerfile
+    container_name: subscription_service
+    environment:
+      - DB_URL=${POSTGRES_DB_URL}
+      - PORT =${SUBSRIPTION_CONTAINER_PORT}
+    ports:
+      - ${SUBSRIPTION_SERVICE_PORTS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - testovoe_network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER:  ${POSTGRES_USER_NAME}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+    ports:
+      - ${POSTGRES_PORTS}
+    volumes:
+    healthcheck:
+        test: ["CMD", "pg_isready", "-U", "postgres"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+    networks:
+      - testovoe_network
+  volumes:
+  subscription_data:
+
+  networks:
+    testovoe_network:
+      driver: bridge
+
+
+        
