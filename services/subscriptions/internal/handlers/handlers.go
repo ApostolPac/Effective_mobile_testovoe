@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -109,10 +108,10 @@ func (h *Handlers) ReadSub(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sub, err := h.s.ReadSub(uuid)
-	if err == sql.ErrNoRows {
-		http.Error(w, "запись о подписке не найдена", http.StatusNotFound)
-		return
-	}
+	// if err == sql.ErrNoRows {
+	// 	http.Error(w, "запись о подписке не найдена", http.StatusNotFound)
+	// 	return
+	// }
 
 	if err != nil {
 		http.Error(w, "ошибка при получении данных по записе о подписке", http.StatusInternalServerError)
