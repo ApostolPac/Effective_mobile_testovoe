@@ -13,7 +13,7 @@ import (
 
 const (
 	dataStructError = "неправильный формат данных"
-	missedLinkError = "ссылка на подписку отсутствует"
+	missedLinkError = "ссылка на запись о подписке отсутствует"
 )
 
 type Service interface {
@@ -24,7 +24,6 @@ type Service interface {
 	DeleteSub(id int) error                                  // Метод для удаления записи о подписке.
 	ShowSubscSum(startPeriod time.Time, EndPeriod time.Time) // Метод для получения сум подписок, для начала работы нужно -
 	// отправить период внутри которого будем искать записи о подписках
-	ShowMethods() error // Метод для показа всех доступных путей и методов.
 }
 
 type Handlers struct {
@@ -89,6 +88,7 @@ func (h *Handlers) CreateSub(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "ошибка при создании записи о подписке", http.StatusInternalServerError)
 		log.Print(err.Error(), " CreateSub method")
+		return
 	}
 
 	err = writeJSON(w, http.StatusOK, "запись о подписке успешно зарегистрирована")
@@ -101,13 +101,13 @@ func (h *Handlers) CreateSub(w http.ResponseWriter, r *http.Request) {
 // Хендлер для чтения записи о подписке
 
 func (h *Handlers) ReadSub(w http.ResponseWriter, r *http.Request) {
-	uuid, err := getSubId(w, r)
+	id, err := getSubId(w, r)
 	if err != nil {
 		log.Print(err.Error(), " ReadSub method")
 		return
 	}
 
-	sub, err := h.s.ReadSub(uuid)
+	sub, err := h.s.ReadSub(id)
 	// if err == sql.ErrNoRows {
 	// 	http.Error(w, "запись о подписке не найдена", http.StatusNotFound)
 	// 	return
@@ -138,6 +138,7 @@ func (h *Handlers) UpdateSub(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "ошибка при обновлении записи о подписке", http.StatusInternalServerError)
 		log.Print(err.Error(), " UpdateSub method")
+		return
 	}
 
 	writeJSON(w, http.StatusOK, "подписка успешно изменена")
@@ -169,12 +170,4 @@ func (h *Handlers) ReadSubs(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Метод для показа функционала/методов для путей запроса
 
-func (h *Handlers) ShowMethods(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func (h *Handlers) ShowSubscSum(w http.ResponseWriter, r *http.Request) {
-
-}
