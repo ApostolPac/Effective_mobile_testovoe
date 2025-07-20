@@ -9,6 +9,7 @@ type Handlers interface {
 	UpdateSub(w http.ResponseWriter, r *http.Request)
 	DeleteSub(w http.ResponseWriter, r *http.Request)
 	ShowMethods(w http.ResponseWriter, r *http.Request)
+	ShowSubscSum(w http.ResponseWriter, r *http.Request)
 }
 type Router struct {
 	r Handlers
@@ -45,6 +46,12 @@ func (router *Router) InitRoutes(mux *http.ServeMux) {
 			router.r.UpdateSub(w, r)
 		case http.MethodGet:
 			router.r.ReadSub(w, r)
+		}
+	})
+	mux.HandleFunc("/subscription/sum", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			router.r.ShowSubscSum(w, r)
 		}
 	})
 }
