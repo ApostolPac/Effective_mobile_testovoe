@@ -1,12 +1,17 @@
 package models
 
-import "time"
 
 type Subscription struct {
-	Id          int       `json:"id"`
-	ServiceName string    `json:"service_name"`
-	Price       int       `json:"price"`
-	UserId      string    `json:"user_id"`
-	StartDate   time.Time `json:"start_date"`
-	EndDate     time.Time `json:"end_date"`
+	Id          int       `json:"id,omitempty"`
+	ServiceName string    `json:"service_name,omitempty"`
+	Price       int       `json:"price,omitempty"`
+	UserId      string    `json:"user_id,omitempty"`
+	StartDate   string `json:"start_date,omitempty"`
+	EndDate     string    `json:"end_date,omitempty"`
+	TotalSum    int       `json:"total_sum,omitempty"`
+}
+
+type ShowSubscSum struct {
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
 }

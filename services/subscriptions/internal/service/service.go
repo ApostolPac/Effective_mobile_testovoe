@@ -1,55 +1,95 @@
 package service
 
 import (
+	"log"
 	"subscriptions/internal/models"
 	"time"
 )
 
+const(
+	rfc = time.RFC3339
+)
+
 type Storage interface {
-	CreateSubRequest(sub models.Subscription)(models.Subscription, error)
-	ReadSubRequest(id int)(models.Subscription, error)
-	ReadSubsRequest(userId string)([]models.Subscription, error)
+	CreateSubRequest(sub models.Subscription)(string, error)
+	ReadSubRequest(id int) (*models.Subscription, error)
+	ReadSubsRequest(userId string) ([]models.Subscription, error)
 	UpdateSubRequest(sub models.Subscription) error
 	DeleteSubRequest(id int) error
-	ShowSubscSumRequest(startPeriod time.Time, EndPeriod time.Time)([]models.Subscription, error)
+	ShowSubscSumRequest(serviceName string, userId string, startPeriod string, EndPeriod string) ([]models.Subscription, error)
 }
 
-type Service struct{
+type ServiceMethods struct {
 	s Storage
 }
 
-func NewService(a Storage) *Service{
-	return &Service{
-		s:a,
-	}	
+func NewService(a Storage) *ServiceMethods {
+	return &ServiceMethods{
+		s: a,
+	}
 }
 
-func CreateSub(sub models.Subscription) error {
+func (service *ServiceMethods) CreateSub(sub models.Subscription)(string, error) {
+	userId, err := service.s.CreateSubRequest(sub)
+	if err != nil {
+		log.Print(err.Error(), "CreateSub method")
+		return "", err
+	}
+	return userId, nil
+}
+
+func (service *ServiceMethods) ReadSub(id int) (*models.Subscription, error) {
+	sub, err := service.s.ReadSubRequest(id)
+
+	if err != nil {
+		log.Print(err.Error(), "ReadSub method")
+		return nil, err
+	}
+
+	return sub, nil
+}
+
+func (service *ServiceMethods) ReadSubs(userId string) ([]models.Subscription, error) {
+	subs, err := service.s.ReadSubsRequest(userId)
+
+	if err != nil {
+		log.Print(err.Error(), "ReadSubs method")
+		return nil, err
+	}
+
+	return subs, nil
+}
+
+func (service *ServiceMethods) UpdateSub(sub models.Subscription) error {
+	err := service.s.UpdateSubRequest(sub)
+
+	if err != nil {
+		log.Print(err.Error(), "UpdateSub method")
+		return err
+	}
 
 	return nil
 }
 
-func ReadSub(id int) (*models.Subscription, error) {
+func (service *ServiceMethods) DeleteSub(id int) error {
+	err := service.s.DeleteSubRequest(id)
+
+	if err != nil {
+		log.Print(err.Error(), "DeleteSub method")
+		return err
+	}
 
 	return nil
 }
 
-func ReadSubs(userId string) ([]models.Subscription, error) {
+func (service *ServiceMethods) ShowSubscSum(serviceName string, userId string, startPeriod string, EndPeriod string) ([]models.Subscription, error) {
 
-	return nil
-}
+	subs, err := service.s.ShowSubscSumRequest(serviceName, userId, startPeriod, EndPeriod)
 
-func UpdateSub(sub models.Subscription) error {
+	if err != nil {
+		log.Print(err.Error(), "ShowSubscSum method")
+		return nil, err
+	}
 
-	return nil
-}
-
-func DeleteSub(id int) error {
-
-	return nil
-}
-
-func ShowSubscSum(startPeriod time.Time, EndPeriod time.Time) error {
-
-	return nil
+	return subs, nil
 }

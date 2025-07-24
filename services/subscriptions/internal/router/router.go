@@ -1,6 +1,9 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
+	"subscriptions/internal/middleware"
+)
 
 type Handlers interface {
 	CreateSub(w http.ResponseWriter, r *http.Request)
@@ -40,10 +43,15 @@ func (router *Router) InitRoutes(mux *http.ServeMux) {
 			router.r.ReadSub(w, r)
 		}
 	})
-	mux.HandleFunc("/subscription/sum", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/subscriptions/sum/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
 			router.r.ShowSubscSum(w, r)
 		}
 	})
+}
+
+func (router *Router) WrapMiddle(mux *http.ServeMux) http.Handler {
+	finalmux := middleware.Middleware(mux)
+	return finalmux
 }
