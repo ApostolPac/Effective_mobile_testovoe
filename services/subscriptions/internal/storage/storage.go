@@ -22,7 +22,6 @@ const (
 	readSubs         = "SELECT id, service_name, price, user_id, start_date, end_date FROM subscriptions WHERE user_id = $1"
 	showsubssum      = "SELECT id, service_name, price, user_id, start_date, end_date FROM subscriptions WHERE user_id = $1 AND service_name = $2 AND start_date >= $3 AND end_date   <= $4 ORDER BY id"
 	showsubstotalsum = "SELECT COALESCE(SUM(price), 0) FROM subscriptions WHERE user_id = $1 AND service_name = $2 AND start_date >= $3 AND end_date   <= $4"
-	rfc = time.RFC3339
 )
 
 type Storage struct {

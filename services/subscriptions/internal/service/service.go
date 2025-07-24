@@ -3,12 +3,8 @@ package service
 import (
 	"log"
 	"subscriptions/internal/models"
-	"time"
 )
 
-const(
-	rfc = time.RFC3339
-)
 
 type Storage interface {
 	CreateSubRequest(sub models.Subscription)(string, error)
