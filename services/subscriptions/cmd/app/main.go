@@ -39,6 +39,7 @@ func main() {
 
 	router := router.NewRouter(h)
 	router.InitRoutes(mux)
+	mux.Handle("/swagger/", httpSwagger.WrapHandler)
 	wrapped := router.WrapMiddle(mux)
 
 	log.Printf("listening on %v", ports)

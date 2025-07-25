@@ -123,8 +123,17 @@ func getUserUuid(r *http.Request) (uuid string, err error) {
 	return userUuid, nil
 }
 
-// Хендлер для создания записи о подписке
-
+// CreateSub godoc
+// @Summary     Создать подписку
+// @Description Создаёт новую подписку. Все данные, включая user_id, передаются в теле запроса.
+// @Tags        subscriptions
+// @Accept      json
+// @Produce     json
+// @Param       subscription  body   models.Subscription true "Данные новой подписки"
+// @Success     200           {string} string           "Подписка создана"
+// @Failure     400           {object} map[string]string "Bad Request"
+// @Failure     500           {object} map[string]string "Internal Server Error"
+// @Router      /subscriptions [post]
 func (h *Handlers) CreateSub(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("CreateSub: method=%s url=%s", r.Method, r.URL.Path)
@@ -169,6 +178,17 @@ func (h *Handlers) CreateSub(w http.ResponseWriter, r *http.Request) {
 
 // Хендлер для чтения записи о подписке
 
+// ReadSub godoc
+// @Summary     Получить подписку по ID
+// @Description Возвращает данные одной подписки по её ID.
+// @Tags        subscriptions
+// @Produce     json
+// @Param       id   path      int    true  "Subscription ID"
+// @Success     200  {object}  models.Subscription "Данные подписки"
+// @Failure     400  {object}  map[string]string   "Bad Request"
+// @Failure     404  {object}  map[string]string   "Not Found"
+// @Failure     500  {object}  map[string]string   "Internal Server Error"
+// @Router      /subscriptions/{id} [get]
 func (h *Handlers) ReadSub(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("ReadSub: method=%v url=%v", r.Method, r.URL.Path)
@@ -208,8 +228,19 @@ func (h *Handlers) ReadSub(w http.ResponseWriter, r *http.Request) {
 	log.Print("ReadSub method: successful request complited")
 }
 
-// Хендлер для обновления записи о подписке
 
+// UpdateSub godoc
+// @Summary     Обновить подписку
+// @Description Обновляет запись подписки: указывается ID в пути и новые данные в теле запроса.
+// @Tags        subscriptions
+// @Accept      json
+// @Produce     json
+// @Param       id            path   int                 true  "Subscription ID"
+// @Param       subscription  body   models.Subscription true  "Новые данные подписки"
+// @Success     200           {string} string           "Подписка обновлена"
+// @Failure     400           {object} map[string]string "Bad Request"
+// @Failure     500           {object} map[string]string "Internal Server Error"
+// @Router      /subscriptions/{id} [put]
 func (h *Handlers) UpdateSub(w http.ResponseWriter, r *http.Request) {
 	log.Printf("UpdateSub: method=%v url=%v", r.Method, r.URL.Path)
 
@@ -264,6 +295,16 @@ func (h *Handlers) UpdateSub(w http.ResponseWriter, r *http.Request) {
 
 // Хендлер для удаления записи о подписке
 
+// DeleteSub godoc
+// @Summary     Удалить подписку
+// @Description Удаляет запись подписки по её ID.
+// @Tags        subscriptions
+// @Produce     json
+// @Param       id   path      int    true  "Subscription ID"
+// @Success     200  {string}  string "Подписка удалена"
+// @Failure     400  {object}  map[string]string "Bad Request"
+// @Failure     500  {object}  map[string]string "Internal Server Error"
+// @Router      /subscriptions/{id} [delete]
 func (h *Handlers) DeleteSub(w http.ResponseWriter, r *http.Request) {
 	log.Printf("DeleteSub: method=%v url=%v", r.Method, r.URL.Path)
 
@@ -307,6 +348,16 @@ func (h *Handlers) DeleteSub(w http.ResponseWriter, r *http.Request) {
 
 // Метод для чтения записей о подписках с общей суммой (показывает все подписки со всеми сервисами для конкретного пользователя)
 
+// ReadSubs godoc
+// @Summary     Получить все подписки пользователя
+// @Description Возвращает список подписок для пользователя, UUID берётся из заголовка Authorization.
+// @Tags        subscriptions
+// @Produce     json
+// @Param       Authorization header string true "User UUID"
+// @Success     200 {array} models.Subscription "Список подписок"
+// @Failure     400 {object} map[string]string      "Bad Request"
+// @Failure     500 {object} map[string]string      "Internal Server Error"
+// @Router      /subscriptions [get]
 func (h *Handlers) ReadSubs(w http.ResponseWriter, r *http.Request) {
 	log.Printf("ReadSubs: method=%v url=%v", r.Method, r.URL.Path)
 
@@ -346,8 +397,20 @@ func (h *Handlers) ReadSubs(w http.ResponseWriter, r *http.Request) {
 	log.Print("ReadSubs method: successful request complited")
 }
 
-// Метод для получения записей о подписке с общей суммой по конкретному
 
+// ShowSubscSum godoc
+// @Summary     Получить подписки и их сумму по сервису за период
+// @Description Сервис указывается в пути, период (start_date и end_date) — в теле, user UUID — в заголовке Authorization.
+// @Tags        subscriptions
+// @Accept      json
+// @Produce     json
+// @Param       Authorization header string               true  "User UUID"
+// @Param       service       path   string               true  "Service name (например, Netflix)"
+// @Param       period        body   models.ShowSubscSum  true  "Период в формате для примера {2025-08-01T00:00:00Z}"
+// @Success     200           {array}  models.Subscription
+// @Failure     400           {object} map[string]string  "Bad Request"
+// @Failure     500           {object} map[string]string  "Internal Server Error"
+// @Router      /subscriptions/sum/{service} [post]
 func (h *Handlers) ShowSubscSum(w http.ResponseWriter, r *http.Request) {
 	log.Printf("ShowSubscSum: method=%v url=%v", r.Method, r.URL.Path)
 	log.Printf("ShowSubscSum: request to getService method")
