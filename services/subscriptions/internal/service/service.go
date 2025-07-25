@@ -38,7 +38,7 @@ func (service *ServiceMethods) ReadSub(id int) (*models.Subscription, error) {
 	sub, err := service.s.ReadSubRequest(id)
 
 	if err != nil {
-		log.Print(err.Error(), "ReadSub method")
+		log.Printf("ReadSub method: error:%v", err.Error())
 		return nil, err
 	}
 
@@ -49,7 +49,7 @@ func (service *ServiceMethods) ReadSubs(userId string) ([]models.Subscription, e
 	subs, err := service.s.ReadSubsRequest(userId)
 
 	if err != nil {
-		log.Print(err.Error(), "ReadSubs method")
+		log.Printf("ReadSubs method: error:%v", err.Error())
 		return nil, err
 	}
 
@@ -60,7 +60,7 @@ func (service *ServiceMethods) UpdateSub(sub models.Subscription) error {
 	err := service.s.UpdateSubRequest(sub)
 
 	if err != nil {
-		log.Print(err.Error(), "UpdateSub method")
+		log.Printf("UpdateSub method: error:%v", err.Error())
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (service *ServiceMethods) DeleteSub(id int) error {
 	err := service.s.DeleteSubRequest(id)
 
 	if err != nil {
-		log.Print(err.Error(), "DeleteSub method")
+		log.Printf("DeleteSub method: error:%v", err.Error())
 		return err
 	}
 
@@ -83,7 +83,7 @@ func (service *ServiceMethods) ShowSubscSum(serviceName string, userId string, s
 	subs, err := service.s.ShowSubscSumRequest(serviceName, userId, startPeriod, EndPeriod)
 
 	if err != nil {
-		log.Print(err.Error(), "ShowSubscSum method")
+		log.Printf("ShowSubscSum method: error:%v", err.Error())
 		return nil, err
 	}
 

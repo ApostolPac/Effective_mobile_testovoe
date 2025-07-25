@@ -32,7 +32,7 @@ func NewStorage() *Storage {
 	postUrl := os.Getenv("POSTGRES_DB_URL")
 	db, err := sql.Open("postgres", postUrl)
 	if err != nil {
-		log.Fatalf("ошибка при запуске бд, %v", err)
+		log.Fatalf("error during database start, %v", err)
 		return nil
 	}
 
@@ -42,30 +42,30 @@ func NewStorage() *Storage {
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("ошибка при подключении к бд, %v", err)
+		log.Fatalf("error during connect to database, %v", err)
 		return nil
 	}
 
 	return &Storage{Db: db}
 }
 
-func TimeForm(start time.Time, end time.Time)(string, string){
+func TimeForm(start time.Time, end time.Time) (string, string) {
 	return start.Format("01-2006"), end.Format("01-2006")
 }
 
 func (s *Storage) RunMigrations() {
 	driver, err := postgres.WithInstance(s.Db, &postgres.Config{})
 	if err != nil {
-		log.Fatalf("инициализации драйвера миграций %v", err)
+		log.Fatalf("error during database driver initialization %v", err)
 	}
 	m, err := migrate.NewWithDatabaseInstance("file://internal/migrations", "postgres", driver)
 
 	if err != nil {
-		log.Fatalf("инициализация миграций: %v", err)
+		log.Fatalf("error during migration initialization: %v", err)
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("ошибка применения файлов миграций: %v", err)
+		log.Fatalf("file application error migration: %v", err)
 	}
 }
 
@@ -74,7 +74,7 @@ func (s *Storage) CreateSubRequest(sub models.Subscription) (string, error) {
 
 	err := s.Db.QueryRow(createSub, sub.ServiceName, sub.Price, sub.UserId, sub.StartDate, sub.EndDate).Scan(&id)
 	if err != nil {
-		log.Print(err.Error(), " CreateSubRequest")
+		log.Printf("CreateSubRequest:error during creation of subscription record, error: %v", err.Error())
 		return "", err
 	}
 
@@ -88,17 +88,16 @@ func (s *Storage) ReadSubRequest(id int) (*models.Subscription, error) {
 	err := s.Db.QueryRow(readSub, id).Scan(&sub.Id, &sub.ServiceName, &sub.Price, &sub.UserId, &startDate, &endDate)
 
 	if err == sql.ErrNoRows {
-		log.Print(err.Error(), " ReadSubRequest")
-		return nil, fmt.Errorf("отсутствует запись о подписке")
+		log.Printf("ReadSubRequest: error during read of subscription record, error: %v", err.Error())
+		return nil, fmt.Errorf("no subscription record in database")
 	}
 
 	if err != nil {
-		log.Print(err.Error(), " ReadSubRequest")
+		log.Printf("ReadSubRequest: error during read of subscription record %v", err.Error())
 		return nil, err
 	}
 
 	sub.StartDate, sub.EndDate = TimeForm(startDate, endDate)
-	
 
 	return &sub, nil
 }
@@ -108,7 +107,7 @@ func (s *Storage) ReadSubsRequest(userId string) ([]models.Subscription, error) 
 
 	rows, err := s.Db.Query(readSubs, userId)
 	if err != nil {
-		log.Print(err.Error(), " ReadSubsRequest")
+		log.Printf("ReadSubsRequest: error during read of subscriptions records, error: %v", err.Error())
 		return nil, err
 	}
 
@@ -119,7 +118,7 @@ func (s *Storage) ReadSubsRequest(userId string) ([]models.Subscription, error) 
 		var startDate, endDate time.Time
 		err = rows.Scan(&sub.Id, &sub.ServiceName, &sub.Price, &sub.UserId, &startDate, &endDate)
 		if err != nil {
-			log.Print(err.Error(), " ReadSubsRequest rowsscan")
+			log.Printf("ReadSubsRequest: error during rowscan, error: %v", err.Error())
 			return nil, err
 		}
 		sub.StartDate, sub.EndDate = TimeForm(startDate, endDate)
@@ -134,7 +133,7 @@ func (s *Storage) UpdateSubRequest(sub models.Subscription) error {
 	_, err := s.Db.Exec(updateSub, sub.ServiceName, sub.Price, sub.UserId, sub.StartDate, sub.EndDate, sub.Id)
 
 	if err != nil {
-		log.Print(err.Error(), " UpdateSubRequest")
+		log.Printf("UpdateSubRequest: error during update of subscription record, error: %v", err.Error())
 		return err
 	}
 
@@ -146,7 +145,7 @@ func (s *Storage) DeleteSubRequest(id int) error {
 	_, err := s.Db.Exec(deleteSub, id)
 
 	if err != nil {
-		log.Print(err.Error(), " DeleteSubRequest")
+		log.Printf("DeleteSubRequest: error during delete of subscription record, error: %v", err.Error())
 		return err
 	}
 
@@ -158,7 +157,7 @@ func (s *Storage) ShowSubscSumRequest(serviceName string, userId string, startPe
 
 	rows, err := s.Db.Query(showsubssum, userId, serviceName, startPeriod, endPeriod)
 	if err != nil {
-		log.Print(err.Error(), " ShowSubscSumRequest showsubssum")
+		log.Printf("ShowSubscSumRequest: error during read of subscriptions records, error: %v", err.Error())
 		return nil, err
 	}
 
@@ -170,13 +169,12 @@ func (s *Storage) ShowSubscSumRequest(serviceName string, userId string, startPe
 		err = rows.Scan(&sub.Id, &sub.ServiceName, &sub.Price, &sub.UserId, &startDate, &endDate)
 
 		if err != nil {
-			log.Print(err.Error(), " ShowSubscSumRequest rowsscan")
+			log.Printf("ShowSubscSumRequest: error during rowscan, error: %v", err.Error())
 			return nil, err
 		}
 
 		sub.StartDate, sub.EndDate = TimeForm(startDate, endDate)
-		
-	
+
 		subs = append(subs, sub)
 	}
 
@@ -189,7 +187,7 @@ func (s *Storage) ShowSubscSumRequest(serviceName string, userId string, startPe
 
 	err = s.Db.QueryRow(showsubstotalsum, userId, serviceName, startPeriod, endPeriod).Scan(&total)
 	if err != nil {
-		log.Print(err.Error(), " ShowSubscSumRequest showsubstotalsum")
+		log.Printf("ShowSubscSumRequest: error during read of sum, error: %v", err.Error())
 		return nil, err
 	}
 	subs = append(subs, models.Subscription{

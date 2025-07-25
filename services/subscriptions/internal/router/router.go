@@ -30,6 +30,8 @@ func (router *Router) InitRoutes(mux *http.ServeMux) {
 			router.r.ReadSubs(w, r)
 		case http.MethodPost:
 			router.r.CreateSub(w, r)
+		default:
+			http.Error(w, "this method are not allowed on this path", http.StatusForbidden)
 		}
 	})
 
@@ -41,12 +43,16 @@ func (router *Router) InitRoutes(mux *http.ServeMux) {
 			router.r.UpdateSub(w, r)
 		case http.MethodGet:
 			router.r.ReadSub(w, r)
+		default:
+			http.Error(w, "this method are not allowed on this path", http.StatusForbidden)
 		}
 	})
 	mux.HandleFunc("/subscriptions/sum/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
 			router.r.ShowSubscSum(w, r)
+		default:
+			http.Error(w, "this method are not allowed on this path", http.StatusForbidden)
 		}
 	})
 }

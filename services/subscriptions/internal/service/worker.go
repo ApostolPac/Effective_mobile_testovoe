@@ -61,7 +61,7 @@ func (w *WorkerPool) worker(i int, jobs <-chan Job) {
 	var err error
 	var result interface{}
 	for job := range jobs {
-		log.Printf("горутина %v получила задачу", i)
+		log.Printf("goroutine %v got task", i)
 		switch job.Type {
 		case JobCreate:
 			result, err = w.s.CreateSub(job.Request)
@@ -76,7 +76,7 @@ func (w *WorkerPool) worker(i int, jobs <-chan Job) {
 		case JobShowSum:
 			result, err = w.s.ShowSubscSum(job.Request.ServiceName, job.Request.UserId, job.Request.StartDate, job.Request.EndDate)
 		}
-		log.Printf("горутина %v выполнила задачу", i)
+		log.Printf("goroutine %v completed task", i)
 		job.Result <- JobResult{Result: result, Error: err}
 	}
 
@@ -128,7 +128,7 @@ func (w *WorkerPool) AsyncReadSub(sub models.Subscription) (*models.Subscription
 	subscr, ok := res.Result.(*models.Subscription)
 
 	if !ok || subscr == nil {
-		return nil, fmt.Errorf("неподходящий тип или отстутствует подписка, %v", ok)
+		return nil, fmt.Errorf("incorrect type or no sub, %v", ok)
 	}
 
 	return subscr, res.Error
@@ -144,7 +144,7 @@ func (w *WorkerPool) AsyncReadSubs(sub models.Subscription) ([]models.Subscripti
 	subscriptions, ok := res.Result.([]models.Subscription)
 
 	if !ok || subscriptions == nil {
-		return nil, fmt.Errorf("неподходящий тип или отстутствуют подписки, %v", ok)
+		return nil, fmt.Errorf("incorrect type or no subs, %v", ok)
 	}
 
 	return subscriptions, res.Error
@@ -160,7 +160,7 @@ func (w *WorkerPool) AsyncShowSubscSum(sub models.Subscription) ([]models.Subscr
 	subscriptions, ok := res.Result.([]models.Subscription)
 
 	if !ok || subscriptions == nil {
-		return nil, fmt.Errorf("неподходящий тип или отстутствуют подписки, %v", ok)
+		return nil, fmt.Errorf("incorrect type or no subs, %v", ok)
 	}
 
 	return subscriptions, res.Error
